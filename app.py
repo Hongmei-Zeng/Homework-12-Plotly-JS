@@ -85,17 +85,15 @@ def samples(sample):
     stmt = db.session.query(Samples).statement
     df = pd.read_sql_query(stmt, db.session.bind)
 
-    # Filter the data based on the sample number and
-    # only keep rows with values above 1
-    sample_data = df.loc[df[sample] > 1, ["otu_id", "otu_label", sample]]
-    # Format the data to send as json
+    sample_data = df.loc[df[sample] > 1, ["otu_id", "otu_label", sample]]    
+    sorted_sample_data = sample_data.sort_values(by=sample, ascending=False)
+
     data = {
-        "otu_ids": sample_data.otu_id.values.tolist(),
-        "sample_values": sample_data[sample].values.tolist(),
-        "otu_labels": sample_data.otu_label.tolist(),
+        "otu_ids": sorted_sample_data.otu_id.values.tolist(),
+        "sample_values": sorted_sample_data[sample].values.tolist(),
+        "otu_labels": sorted_sample_data.otu_label.tolist(),
     }
     return jsonify(data)
 
-
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
